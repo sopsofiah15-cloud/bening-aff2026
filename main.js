@@ -64,48 +64,39 @@ function renderSchedule(matches) {
     return;
   }
 
-  const byDate = {};
-  filtered.forEach((m) => {
-    const key = new Date(m.date).toDateString();
-    if (!byDate[key]) byDate[key] = [];
-    byDate[key].push(m);
-  });
-
-  scheduleEl.innerHTML = Object.entries(byDate)
-    .map(([key, list]) => {
-      const cards = list
-        .map(
-          (m) => `
-        <article class="match-card">
-          <div class="match-top">
-            <span class="badge badge-group">${groupLabel(m.group)}</span>
-            ${badgeForStatus(m)}
-          </div>
-          <div class="match-teams">
-            <div class="team home">
-              <img src="${teamLogo(m.home)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"/>
-              <span class="team-name">${m.home.name || 'TBD'}</span>
-            </div>
-            <div class="score-box">
-              ${m.status === 'scheduled'
-                ? '<span class="score-vs">VS</span>'
-                : `<span>${m.home.score ?? '-'}</span><span class="score-vs">:</span><span>${m.away.score ?? '-'}</span>`}
-            </div>
-            <div class="team away">
-              <img src="${teamLogo(m.away)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"/>
-              <span class="team-name">${m.away.name || 'TBD'}</span>
-            </div>
-          </div>
-          <div class="match-meta">
-            <span>${m.venueName || 'Venue belum diumumkan'}</span>
-            <span>${m.venueCity || ''}</span>
-          </div>
-        </article>`
-        )
-        .join('');
-      return `<div class="day-group"><div class="day-label">${fmtDateLabel(list[0].date)}</div><div class="match-grid">${cards}</div></div>`;
-    })
+  const cards = filtered
+    .map(
+      (m) => `
+    <article class="match-card">
+      <div class="match-top">
+        <span class="badge badge-group">${groupLabel(m.group)}</span>
+        ${badgeForStatus(m)}
+      </div>
+      <div class="match-date">${fmtDateLabel(m.date)}</div>
+      <div class="match-teams">
+        <div class="team home">
+          <img src="${teamLogo(m.home)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"/>
+          <span class="team-name">${m.home.name || 'TBD'}</span>
+        </div>
+        <div class="score-box">
+          ${m.status === 'scheduled'
+            ? '<span class="score-vs">VS</span>'
+            : `<span>${m.home.score ?? '-'}</span><span class="score-vs">:</span><span>${m.away.score ?? '-'}</span>`}
+        </div>
+        <div class="team away">
+          <img src="${teamLogo(m.away)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"/>
+          <span class="team-name">${m.away.name || 'TBD'}</span>
+        </div>
+      </div>
+      <div class="match-meta">
+        <span>${m.venueName || 'Venue belum diumumkan'}</span>
+        <span>${m.venueCity || ''}</span>
+      </div>
+    </article>`
+    )
     .join('');
+
+  scheduleEl.innerHTML = `<div class="match-grid">${cards}</div>`;
 }
 
 /* ------------------------------ KLASEMEN -------------------------------- */
