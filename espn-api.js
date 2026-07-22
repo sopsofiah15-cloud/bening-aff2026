@@ -141,35 +141,48 @@ async function getMatches(range) {
 function computeStandings(matches) {
   const table = {}; // group -> teamId -> row
 
+  function ensureTeam(group, team) {
+    if (!team || !team.name) return null;
+    if (!table[group]) table[group] = {};
+    const key = team.id || team.name;
+    if (!table[group][key]) {
+      table[group][key] = {
+        id: key,
+        name: team.name,
+        abbrev: team.abbrev,
+        logo: team.logo,
+        played: 0,
+        win: 0,
+        draw: 0,
+        lose: 0,
+        gf: 0,
+        ga: 0,
+        pts: 0,
+      };
+    }
+    return table[group][key];
+  }
+
+  // Pass 1: daftarkan semua tim yang muncul di jadwal fase grup (walau belum main),
+  // supaya tabel klasemen langsung tersusun rapi sejak jadwal terbit.
+  matches.forEach((m) => {
+    if (!/^[A-Z]$/.test(m.group)) return;
+    ensureTeam(m.group, m.home);
+    ensureTeam(m.group, m.away);
+  });
+
+  // Pass 2: hitung hasil dari pertandingan yang sudah selesai saja.
   matches.forEach((m) => {
     if (m.status !== 'finished') return;
-    if (!/^[A-Z]$/.test(m.group)) return; // hanya huruf tunggal = fase grup
+    if (!/^[A-Z]$/.test(m.group)) return;
     if (m.home.score === null || m.away.score === null) return;
-
-    if (!table[m.group]) table[m.group] = {};
-    const grp = table[m.group];
 
     [
       { team: m.home, gf: m.home.score, ga: m.away.score },
       { team: m.away, gf: m.away.score, ga: m.home.score },
     ].forEach(({ team, gf, ga }) => {
-      const key = team.id || team.name;
-      if (!grp[key]) {
-        grp[key] = {
-          id: key,
-          name: team.name,
-          abbrev: team.abbrev,
-          logo: team.logo,
-          played: 0,
-          win: 0,
-          draw: 0,
-          lose: 0,
-          gf: 0,
-          ga: 0,
-          pts: 0,
-        };
-      }
-      const row = grp[key];
+      const row = ensureTeam(m.group, team);
+      if (!row) return;
       row.played += 1;
       row.gf += gf;
       row.ga += ga;
@@ -202,7 +215,23 @@ function computeStandings(matches) {
  * Gol bunuh diri ("Own Goal") sengaja tidak dihitung sebagai gol pencetak skor.
  */
 function computeTopScorers(matches) {
-  const scorers = {}; // playerKey -> { name, team, teamLogo, goals }
+  const players = {}; // playerKey -> { name, team, teamLogo, goals, assists }
+
+  function ensurePlayer(athlete, team) {
+    const key = athlete.id || athlete.displayName;
+    if (!players[key]) {
+      players[key] = {
+        id: key,
+        name: athlete.displayName || athlete.shortName || 'Pemain',
+        team: team.name || '-',
+        teamAbbrev: team.abbrev || '',
+        teamLogo: team.logo || '',
+        goals: 0,
+        assists: 0,
+      };
+    }
+    return players[key];
+  }
 
   matches.forEach((m) => {
     if (!Array.isArray(m.details)) return;
@@ -220,26 +249,21 @@ function computeTopScorers(matches) {
       const athletes = d.athletesInvolved || (d.athlete ? [d.athlete] : []);
       if (!athletes.length) return;
 
-      const scorer = athletes[0];
       const teamId = d.team && d.team.id;
       const team = teamById[teamId] || {};
-      const key = scorer.id || scorer.displayName;
 
-      if (!scorers[key]) {
-        scorers[key] = {
-          id: key,
-          name: scorer.displayName || scorer.shortName || 'Pemain',
-          team: team.name || '-',
-          teamAbbrev: team.abbrev || '',
-          teamLogo: team.logo || '',
-          goals: 0,
-        };
+      const scorer = ensurePlayer(athletes[0], team);
+      scorer.goals += 1;
+
+      // ESPN kadang menyertakan pemberi assist sebagai athlete kedua di event gol
+      if (athletes[1]) {
+        const assister = ensurePlayer(athletes[1], team);
+        assister.assists += 1;
       }
-      scorers[key].goals += 1;
     });
   });
 
-  return Object.values(scorers).sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name));
+  return Object.values(players).sort((a, b) => b.goals - a.goals || b.assists - a.assists || a.name.localeCompare(b.name));
 }
 
 /**
