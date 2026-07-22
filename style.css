@@ -202,8 +202,32 @@ body {
    Hero
    ========================================================================== */
 .hero {
+  position: relative;
   padding: 64px 0 30px;
   text-align: center;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero::before {
+  /* banner */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: url("https://ik.imagekit.io/udoscsqhu/bening%20slide%20benner.png");
+  background-size: cover;
+  background-position: center;
+}
+.hero::after {
+  /* overlay gelap-emas supaya teks tetap terbaca di atas banner */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(70% 60% at 50% 20%, rgba(212, 165, 55, 0.14), transparent 65%),
+    linear-gradient(180deg, rgba(9, 8, 10, 0.55) 0%, rgba(9, 8, 10, 0.82) 70%, rgba(9, 8, 10, 0.95) 100%);
 }
 .hero .eyebrow {
   font-size: 0.72rem;
