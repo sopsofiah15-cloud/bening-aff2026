@@ -142,27 +142,72 @@ function renderStandings(matches) {
 /* ------------------------------ TOP SKOR -------------------------------- */
 
 function renderTopScorers(matches) {
-  const scorers = computeTopScorers(matches).slice(0, 10);
+  const scorers = computeTopScorers(matches);
 
   if (!scorers.length) {
-    scorerEl.innerHTML = `<div class="empty-state"><strong>Belum ada data gol</strong>Daftar top skor otomatis muncul begitu ada gol yang tercatat di pertandingan.</div>`;
+    clearInterval(scorerAutoTimer);
+    scorerEl.innerHTML = `<div class="empty-state"><strong>Belum ada data gol</strong>Kartu top skor otomatis muncul dan bertambah begitu ada gol yang tercatat di pertandingan.</div>`;
     return;
   }
 
-  scorerEl.innerHTML = `<div class="scorer-list">${scorers
+  const cards = scorers
     .map(
       (s, i) => `
-    <div class="scorer-row">
-      <span class="rank">${i + 1}</span>
-      <img src="${s.teamLogo || ''}" alt="" onerror="this.style.visibility='hidden'"/>
-      <div class="scorer-info">
-        <div class="scorer-name">${s.name}</div>
-        <div class="scorer-team">${s.team}</div>
+    <div class="scorer-card">
+      <span class="rank-tag">#${i + 1}</span>
+      <img class="scorer-flag" src="${s.teamLogo || ''}" alt="${s.team}" onerror="this.style.visibility='hidden'"/>
+      <div class="scorer-card-body">
+        <div class="scorer-card-row"><span class="label">Nama</span><span class="value">${s.name}</span></div>
+        <div class="scorer-card-row"><span class="label">Negara</span><span class="value">${s.team}</span></div>
+        <div class="scorer-card-row"><span class="label">Goal</span><span class="value gold">${s.goals}</span></div>
+        <div class="scorer-card-row"><span class="label">Assists</span><span class="value">${s.assists}</span></div>
       </div>
-      <div class="scorer-goals">${s.goals}<span>gol</span></div>
     </div>`
     )
-    .join('')}</div>`;
+    .join('');
+
+  scorerEl.innerHTML = `
+    <div class="scorer-carousel">
+      <button class="carousel-btn prev" type="button" aria-label="Sebelumnya">‹</button>
+      <div class="scorer-track" id="scorer-track">${cards}</div>
+      <button class="carousel-btn next" type="button" aria-label="Berikutnya">›</button>
+    </div>`;
+
+  setupScorerCarousel();
+}
+
+let scorerAutoTimer = null;
+
+function scorerCardStep(track, dir) {
+  const card = track.querySelector('.scorer-card');
+  const amount = card ? card.getBoundingClientRect().width + 16 : 240;
+  track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+}
+
+function startScorerAutoplay(track) {
+  clearInterval(scorerAutoTimer);
+  scorerAutoTimer = setInterval(() => {
+    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    if (atEnd) {
+      track.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      scorerCardStep(track, 1);
+    }
+  }, 3500);
+}
+
+function setupScorerCarousel() {
+  const track = document.getElementById('scorer-track');
+  if (!track) return;
+  const prevBtn = scorerEl.querySelector('.carousel-btn.prev');
+  const nextBtn = scorerEl.querySelector('.carousel-btn.next');
+
+  prevBtn && prevBtn.addEventListener('click', () => scorerCardStep(track, -1));
+  nextBtn && nextBtn.addEventListener('click', () => scorerCardStep(track, 1));
+  track.addEventListener('mouseenter', () => clearInterval(scorerAutoTimer));
+  track.addEventListener('mouseleave', () => startScorerAutoplay(track));
+
+  startScorerAutoplay(track);
 }
 
 /* -------------------------------- MAIN ----------------------------------- */
