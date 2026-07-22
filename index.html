@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Piala AFF 2026 — Jadwal, Klasemen &amp; Top Skor</title>
+<meta name="description" content="Jadwal lengkap, klasemen grup, dan top skor Piala AFF 2026 (ASEAN Championship) — update otomatis dari ESPN." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="pitch-bg" aria-hidden="true"></div>
+
+<header class="navbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-badge">AFF</span>
+      <span>
+        Piala AFF 2026
+        <small>ASEAN Championship</small>
+      </span>
+    </div>
+    <nav class="nav-links">
+      <a href="#jadwal" class="active">Jadwal</a>
+      <a href="#klasemen">Klasemen</a>
+      <a href="#topskor">Top Skor</a>
+    </nav>
+    <span id="live-indicator" class="status-pill indicator-ok">● Memuat…</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="eyebrow">ASEAN Hyundai Cup · 24 Jul — 26 Agu 2026</span>
+    <h1>Piala AFF 2026</h1>
+    <p>Jadwal lengkap, klasemen grup, dan daftar top skor — semua diambil dan diperbarui otomatis langsung dari data ESPN, tanpa perlu refresh manual.</p>
+  </section>
+
+  <!-- ============================= JADWAL ============================= -->
+  <section id="jadwal" class="section">
+    <div class="section-head">
+      <div>
+        <span class="tag">Match Center</span>
+        <h2>Jadwal Lengkap</h2>
+      </div>
+      <div id="group-filters" class="chip-row">
+        <button class="chip active" data-group="ALL">Semua</button>
+      </div>
+    </div>
+    <div id="schedule-container">
+      <div class="loading-spin"></div>
+    </div>
+  </section>
+
+  <!-- ============================ KLASEMEN ============================ -->
+  <section id="klasemen" class="section">
+    <div class="section-head">
+      <div>
+        <span class="tag">Fase Grup</span>
+        <h2>Klasemen</h2>
+      </div>
+    </div>
+    <div id="standings-container" class="standings-grid">
+      <div class="loading-spin"></div>
+    </div>
+  </section>
+
+  <!-- ============================ TOP SKOR ============================ -->
+  <section id="topskor" class="section">
+    <div class="section-head">
+      <div>
+        <span class="tag">Pencetak Gol</span>
+        <h2>Top Skor</h2>
+      </div>
+    </div>
+    <div id="topscorer-container" class="card card-dark">
+      <div class="loading-spin"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-cards">
+      <div class="card card-dark footer-brand">
+        <h3>Piala AFF 2026</h3>
+        <p>Portal tidak resmi berisi jadwal, klasemen, dan top skor ASEAN Championship 2026. Data pertandingan disediakan oleh ESPN dan diperbarui otomatis secara berkala.</p>
+      </div>
+      <div class="card card-gold newsletter-card">
+        <div>
+          <strong>Live Update</strong>
+          <span>Skor diperbarui tiap 30 detik saat pertandingan berlangsung</span>
+        </div>
+        <button class="btn-gold" onclick="location.reload()">Refresh</button>
+      </div>
+      <div class="card card-cream footer-links">
+        <strong>Navigasi</strong>
+        <ul>
+          <li><a href="#jadwal">Jadwal Lengkap</a></li>
+          <li><a href="#klasemen">Klasemen</a></li>
+          <li><a href="#topskor">Top Skor</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Piala AFF 2026 Portal · Dibuat untuk penggemar sepak bola Asia Tenggara</span>
+      <span class="src">Sumber data: ESPN API</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/espn-api.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
